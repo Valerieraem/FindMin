@@ -1,0 +1,146 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class FindMinMax {
+    public static void main(String args[]) throws FileNotFoundException {
+        //making an arraylist of doubles to save in our values to be tested
+        ArrayList<Double> data = new ArrayList<>();
+        Scanner scanner = new Scanner(System.in);
+        String fileName;  //going to save file name in here
+
+        System.out.println("Enter a file name to load data from"); //asking user for filename for input
+        fileName = scanner.nextLine(); //saving the file name to the filename string variable
+        Scanner fileScan = new Scanner(new File(fileName)); //scanner to load in file contents
+
+
+        int i = 0;
+        //loading in the file contents to the data arraylist while filescan has a next double value,
+        //save that double value to the data arraylist
+        //then we are printing the values of the arraylist out so we can see that it works using int i
+        System.out.println("Loading and printing contents of file: ");
+        while(fileScan.hasNextDouble()) {
+            data.add(fileScan.nextDouble());
+            System.out.println(data.get(i));
+            i++;
+        }
+
+        System.out.println();
+
+        //set first to 0 (first position), last is the size of the array-1, and min/max is set to the first index for the start
+        //max and min position are both set to 0 to start
+        int first = 0;
+        int last = data.size()-1;
+        double min = data.get(0);
+        double max = data.get(0);
+        int maxPosition = 0;
+        int minPosition = 0;
+
+        //creating a new MinMaxObject to use in the recursive function
+        MinMaxObject objectOne = new MinMaxObject(max, min, maxPosition, minPosition);
+
+        //calling the recursive function
+        MinMaxRecursive(data,first,last,objectOne);
+
+        //printing out the data from the MinMaxObject
+        System.out.println("Minimum Value: " + objectOne.getMinValue() + " Minimum Position: " + objectOne.getMinPos() +
+                " Max Value: " + objectOne.getMaxValue() + " Max Position: " + objectOne.getMaxPos());
+
+    }//end main
+
+
+    //minmax recursive method, this is where we will be calculating the max/min and saving the calculations to the minmaxobject
+    public static MinMaxObject MinMaxRecursive(ArrayList<Double> data, int first, int last, MinMaxObject objectOne) {
+
+        //if only one item in the array, then return objectOne, which has the minimum value already set to the first index.
+        //there will not be a max value in this case
+        if(first > last) {
+            return objectOne;
+        }
+
+        else {
+            //if the value at the first index is less than the minValue of objectOne, then update the min value for objectOne
+            //with the value at the index of data
+            //first is increased by 1, so we look at the next index in the arraylist when the function is recalled
+            if(data.get(first) < objectOne.getMinValue()) {
+                //updating min value for objectOne using setMinValue and updating minPosition
+                objectOne.setMinValue(data.get(first));
+                objectOne.setMinPos(first);
+
+                //increment first
+
+                //recursive call
+                MinMaxRecursive(data,first+1,last,objectOne);
+            }
+
+            //if the value at the index of first in the arraylist is > than the value of the max value in object
+            if(data.get(first) > objectOne.getMaxValue()) {
+                //update max value with the new value from data at the first index
+                objectOne.setMaxValue(data.get(first));
+                //set the max position to the index of first
+                objectOne.setMaxPos(first);
+
+                //recall
+                MinMaxRecursive(data,first+1,last,objectOne);
+            }
+
+            //need to have one last recall at the end
+            MinMaxRecursive(data,first+1,last,objectOne);
+        }
+        //return the objectOne
+        return objectOne;
+    }//end MinMaxRecursive
+
+
+    //interior class called MinMaxObject - will hold the data that needs to be returned from the recursive function
+    public static class MinMaxObject{
+        //private variables for the min/max etc.
+        private double maxValue, minValue;
+        private int maxPos, minPos;
+
+
+        //constructor with values passed through, needed to save to object
+        public MinMaxObject(double max, double min, int maxPosition, int minPosition) {
+            //saving values from minmaxrecursive return
+            maxValue = max;
+            minValue = min;
+            maxPos = maxPosition;
+            minPos = minPosition;
+        }
+
+        //getters and setters for all of the variables for the MinMaxObject
+
+        public double getMaxValue() {
+            return maxValue;
+        }
+
+        public double getMinValue() {
+            return minValue;
+        }
+
+        public int getMaxPos() {
+            return maxPos;
+        }
+
+        public int getMinPos() {
+            return minPos;
+        }
+
+        public void setMinValue(double min) {
+            minValue = min;
+        }
+
+        public void setMaxPos(int maxPosition) {
+            maxPos = maxPosition;
+        }
+
+        public void setMaxValue(double max) {
+            maxValue = max;
+        }
+
+        public void setMinPos(int minPosition) {
+            minPos = minPosition;
+        }
+    }//end MinMaxObject
+}//end FindMinMax class
